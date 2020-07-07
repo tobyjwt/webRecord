@@ -1,0 +1,38 @@
+{
+  "name": "webrecord",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/web-record.cjs.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jwentao/webRecord.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jwentao/webRecord/issues"
+  },
+  "homepage": "https://github.com/jwentao/webRecord#readme",
+  "devDependencies": {
+    "@babel/core": "7.7.2",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/plugin-proposal-private-methods": "^7.10.4",
+    "@babel/preset-env": "7.7.1",
+    "eslint": "^6.6.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "rollup-plugin-babel": "4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-eslint": "^7.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "lz-string": "^1.4.4",
+    "rrweb": "^0.8.2"
+  }
+}
