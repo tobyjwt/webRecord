@@ -4,7 +4,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var rrweb = require('rrweb');
 var axios = _interopDefault(require('axios'));
-var LZString = _interopDefault(require('lz-string'));
+require('lz-string');
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -81,13 +81,11 @@ var _delay = new WeakMap();
 
 var _protectId = new WeakMap();
 
-var _eventId = new WeakMap();
-
-var record = /*#__PURE__*/function () {
-  function record() {
+var WebRecord = /*#__PURE__*/function () {
+  function WebRecord() {
     var option = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-    _classCallCheck(this, record);
+    _classCallCheck(this, WebRecord);
 
     _defineProperty(this, "eventsMatrix", void 0);
 
@@ -101,10 +99,7 @@ var record = /*#__PURE__*/function () {
       value: []
     });
 
-    _eventId.set(this, {
-      writable: true,
-      value: 0
-    });
+    _defineProperty(this, "eventId", 0);
 
     if (option.id === undefined) {
       throw new Error('id of record is necessary');
@@ -113,11 +108,9 @@ var record = /*#__PURE__*/function () {
     this.init(option);
   }
 
-  _createClass(record, [{
+  _createClass(WebRecord, [{
     key: "init",
     value: function init(option) {
-      var _this = this;
-
       var _option$delay = option.delay,
           delay = _option$delay === void 0 ? 10 : _option$delay;
 
@@ -133,10 +126,15 @@ var record = /*#__PURE__*/function () {
       rrweb.record({
         emit: function emit(event, isCheckout) {
           if (isCheckout) {
+            // console.log('is check');
+            // console.log(pack(_that.eventsMatrix[_that.eventsMatrix.length - 1]));
+            // console.log(JSON.stringify(_that.eventsMatrix[_that.eventsMatrix.length - 1]));
             _that.eventsMatrix.push({
-              id: _classPrivateFieldSet(this, _eventId, +_classPrivateFieldGet(this, _eventId) + 1),
+              id: ++_that.eventId,
               events: []
             });
+
+            _that.clear();
           } // window.events.push(event);
 
 
@@ -144,35 +142,50 @@ var record = /*#__PURE__*/function () {
         },
         checkoutEveryNms: 10 * 1000 // 每10秒重新制作快照
 
-      }); // mock trigger report
-
-      setTimeout(function () {
-        _this.report();
-      }, 2000);
+      });
     }
   }, {
     key: "clear",
-    value: function clear() {}
+    value: function clear() {
+      if (this.eventsMatrix.length > 4) {
+        this.eventsMatrix.shift();
+      }
+    }
   }, {
     key: "report",
     value: function report() {
-      var curEvent = this.eventsMatrix[this.eventsMatrix.length - 1];
-      console.log(curEvent);
+      var _this = this;
 
-      _classPrivateFieldGet(this, _protectId).push(curEvent.id);
-
-      var eventData = curEvent.events;
-      var string = JSON.stringify(eventData);
-      var lzString = LZString.compress(string);
-      var file = new File([string], 'test.txt');
-      console.log(string);
-      var param = new FormData();
-      param.append('file', file);
-      param.append('name', 123);
+      // const curEvent = this.eventsMatrix[this.eventsMatrix.length - 1];
+      // console.log(curEvent);
+      // this.#protectId.push(curEvent.id);
+      // const eventData = curEvent.events;
+      // const string = JSON.stringify(eventData);
+      // const lzString = LZString.compress(string);
+      // const file = new File([string], 'test.txt');
+      // const param = new FormData();
+      // param.append('file',file);
+      // param.append('name',123);
+      console.log('trigger report');
       setTimeout(function () {
-        // do report
+        console.log(_classPrivateFieldGet(_this, _delay));
+
+        var postData = _this.eventsMatrix.slice(-2).map(function (item) {
+          return item.events;
+        }).reduce(function (a, b) {
+          return a.concat(b);
+        });
+
+        var string = rrweb.pack(postData);
+        console.log(string);
+        var file = new File([string], 'test.txt');
+        var param = new FormData();
+        param.append('file', file);
+        param.append('name', 123);
+        console.log('report'); // do report
+
         axios({
-          url: 'http://localhost:3000/upLoad',
+          url: 'http://172.24.101.146:3000/upLoad',
           method: 'post',
           headers: {
             'content-Type': 'multipart/form-data'
@@ -183,7 +196,7 @@ var record = /*#__PURE__*/function () {
     }
   }]);
 
-  return record;
+  return WebRecord;
 }();
 
-module.exports = record;
+module.exports = WebRecord;
